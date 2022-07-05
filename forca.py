@@ -75,8 +75,9 @@ def stickman(letrasErradas, mascara, id, dificuldadeExtenso, qtdTentativas,qtdJo
         print("  |  |")
         print(" [ ] |")
         print("=======")
-        testeFinal(mascara)
       
+def palavraEscolhida(*lista):
+    return lista[0],lista[1],lista[3],lista[4],lista[5]
             
 def jogo():
     '''
@@ -89,18 +90,15 @@ def jogo():
     tentativas = 0
     print('Qual a Dificuldade que gostaria de jogar? 1 - Fácil; 2 - Médio; 3 - Difícil')
     dificuldade = (int)(input('Sua opção: '))
-    palavraEscolhida = GDB.escolher_palavra(dificuldade)
-    id = palavraEscolhida[0]
-    palavra = palavraEscolhida[1]
     if dificuldade == 1:
         dificuldadeExtenso = 'Fácil'
     elif dificuldade == 2:
         dificuldadeExtenso = 'Médio'
     else:
         dificuldadeExtenso = 'Difícil'
-    qtdTentativas = palavraEscolhida[3]
-    qtdJogadas = palavraEscolhida[4]
-    qtdAcertos = palavraEscolhida[5]
+        
+    id,palavra,qtdTentativas,qtdJogadas,qtdAcertos = palavraEscolhida(*GDB.escolher_palavra(dificuldade))
+   
     
     #Criação da Mascara
     for i in range(len(palavra)):
