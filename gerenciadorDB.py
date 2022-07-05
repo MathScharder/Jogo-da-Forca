@@ -1,18 +1,20 @@
 #!/usr/bin/env python
 #encoding: UTF-8
 
-import csv
 import pandas as pd
-import random
+from random import randrange
 
 def adicionar_Palavra(id, palavra, dificul, qtd_tent, qtd_jog, qtd_acertos):
     '''
     Função para adicionar uma palavra do arquivo CSV
     '''
     if verificar(palavra):
-        with open(filename, 'a', newline='') as csvfile:
-            csvwriter = csv.writer(csvfile,delimiter=';',quoting=csv.QUOTE_MINIMAL)
-            csvwriter.writerow([id,palavra,dificul,qtd_tent,qtd_jog,qtd_acertos])
+        df = pd.DataFrame({'id':[id],'palavra':[palavra],
+                           'dificuldade':[dificul],
+                           'qtd_de_tentativas':[qtd_tent],
+                           'qtd_jogadas':[qtd_jog],
+                           'qtd_de_acertos':[qtd_acertos]})
+        df.to_csv(_filename, mode = 'a',header=False ,index = False, sep = ';')
     else:
         print('\n palavra ja existe no banco de dados!!! \n\n')
 
@@ -24,16 +26,16 @@ def remover_Palavra(palavra):
     if verificar(palavra):
         print('\nPalavra não existe no banco de dados!!! \n\n')
     else:
-        df = pd.read_csv(filename,delimiter=';')
+        df = pd.read_csv(_filename,delimiter=';')
         df = df[df.palavra != palavra]
-        df.to_csv(filename,index=False,sep=';')
+        df.to_csv(_filename,index=False,sep=';')
      
  
 def verificar(palavra):
     '''
     Função interna para verificar se uma palavra está na ou não no arquivo csv
     '''
-    df = pd.read_csv(filename, sep=';')
+    df = pd.read_csv(_filename, sep=';')
     df = df[(df['palavra'] == palavra)]
     if df.empty:  #retorna verdadeiro se o dataframe estiver vazio, o que significa que ele não achou a palavra
         return True
@@ -47,7 +49,7 @@ def consultar(palavra):
     if verificar(palavra):
         print('\nPalavra não existe no banco de dados!!! \n\n')
     else:
-        df = pd.read_csv(filename, sep=';')
+        df = pd.read_csv(_filename, sep=';')
         df = df[(df['palavra'] == palavra)]
         print(df.to_string(index=False))
         
@@ -56,7 +58,7 @@ def listar():
     '''
     Função para listar todos as palavras cadastradas no arquivo csv
     '''
-    df = pd.read_csv(filename,sep=';')
+    df = pd.read_csv(_filename,sep=';')
     print(df.to_string(index=False))
      
      
@@ -64,7 +66,7 @@ def buscar(palavra):
     '''
     função para mostrar todas as palavras a partir de uma parte da palavra
     '''
-    df = pd.read_csv(filename, sep=';')
+    df = pd.read_csv(_filename, sep=';')
     df = df[df['palavra'].str.contains(palavra, na = False)]
     if df.empty:
         print('\nNão existe palavra com esses caracteres!!!\n\n')
@@ -76,7 +78,7 @@ def listar_dificuldade(dificuldade):
     '''
     Função para listar todas as palavras de uma determinada dificuldade
     '''
-    df = pd.read_csv(filename, sep=';')
+    df = pd.read_csv(_filename, sep=';')
     df = df[df['dificuldade'] == dificuldade]
     if df.empty:
         print('\nNão existe palavra para esta dificuldade!!!\n\n')
@@ -87,7 +89,7 @@ def apresentar_estatísticas():
     '''
     Função para apresentar as 5 palavras mais jogadas, 5 com mais acertos, 5 com mais erros
     '''
-    df = pd.read_csv(filename, sep=';')
+    df = pd.read_csv(_filename, sep=';')
     dfl = df.nlargest(5,'qtd_jogadas')[['id','palavra','qtd_jogadas']]
     print(dfl.to_string(index=False))
     print('\n')
@@ -105,13 +107,13 @@ def escolher_palavra(dificuldade):
     Função para retornar uma palavra de acordo com a dificuldade
     '''
     palavra_escolhida = []
-    df = pd.read_csv(filename,sep=';')
+    df = pd.read_csv(_filename,sep=';')
     df = df[df['dificuldade'] == dificuldade]
     if df.empty:
         print('\nNão existe palavra para esta dificuldade!!!\n\n')
     else:
         listaindex = (df.index.values) #cria uma lista com os Id's das palavras da dificuldade desejada
-        x = random.randrange(0,len(listaindex))  #randomiza um indice da lista de index
+        x = randrange(0,len(listaindex))  #randomiza um indice da lista de index
         palavra_escolhida.append(df['id'].loc[listaindex[x]])
         palavra_escolhida.append(df['palavra'].loc[listaindex[x]])
         palavra_escolhida.append(df['dificuldade'].loc[listaindex[x]])
@@ -126,20 +128,20 @@ def retornar_palavra(id,palavra,dificuldade,qtd_tent,qtd_jogadas,qtd_acertos):
     '''
     Função para retornar a palavra com as devidas modificações para o arquivo CSV
     '''
-    df = pd.read_csv(filename,sep=';')
+    df = pd.read_csv(_filename,sep=';')
     df.loc[(id-1):(id-1)] = id, palavra, dificuldade, qtd_tent, qtd_jogadas, qtd_acertos
-    df.to_csv(filename,index=False,sep=';')
+    df.to_csv(_filename,index=False,sep=';')
     
 def ultimoID():
     '''
     Retorna o Último Id que foi adicionado
     '''
-    df = pd.read_csv(filename,sep=';')
+    df = pd.read_csv(_filename,sep=';')
     dfl = df.nlargest(1,'id')[['id']]
     ultimoIndice = dfl['id'].squeeze()
     return(ultimoIndice)
     
-filename = 'database.csv'
+_filename = 'database.csv'
 
 
 
